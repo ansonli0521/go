@@ -1,0 +1,24 @@
+<table>
+    <tr>
+        <th>Black Player</th>
+        <th>White Player</th>
+        <th>Result</th>
+        <th>Game Date</th>
+    </tr>
+    {% for game in games %}
+        <tr>
+            <td>
+                <a href="{% url 'elo:profile' game.black.id %}">{{ game.black.name }}</a>
+            </td>
+            <td>
+                <a href="{% url 'elo:profile' game.white.id %}">{{ game.white.name }}</a>
+            </td>
+            <td>
+                {{ game.result }}
+            </td>
+            <td>
+                {{ game.game_date }}
+            </td>
+        </tr>
+    {% endfor %}
+</table>

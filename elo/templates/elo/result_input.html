@@ -1,0 +1,26 @@
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+<h1>Game Result Input</h1>
+<form action="{% url 'elo:elo_calculate' %}" method="post">
+{% csrf_token %}
+    <fieldset>
+        <label for="black">Black Player:</label>
+        <input type="text" id="black" name="black"><br><br>
+        <label for="white">White Player:</label>
+        <input type="text" id="white" name="white"><br><br>
+        <label for="result">Game Result:</label>
+        <select name="result" id="result">
+            <option value="B">Black Wins</option>
+            <option value="W">White Wins</option>
+            <option value="D">Draw</option>
+        </select><br><br>
+        <label for="game_date">Game Date:</label>
+        <input type="date" id="game_date" name="game_date"><br><br>
+    </fieldset>
+<input type="submit" value="Submit">
+</form>

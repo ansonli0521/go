@@ -1,0 +1,16 @@
+<table>
+    <tr>
+        <th>Player</th>
+        <th>Elo</th>
+    </tr>
+    {% for player in players %}
+        <tr>
+            <td>
+                <a href="{% url 'elo:profile' player.id %}">{{ player.name }}</a>
+            </td>
+            <td>
+                {{ player.elo }}
+            </td>
+        </tr>
+    {% endfor %}
+</table>
