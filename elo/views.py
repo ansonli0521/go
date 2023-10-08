@@ -61,14 +61,15 @@ def elo_calculate(request):
     )
     new_game.save()
 
-    base = whr.Base(config={'w2': 30})
+    base = whr.Base(config={'w2': 300})
     games = Game.objects.order_by('game_date')
-    start_date = date(2023, 1, 1)
+    start_date = date(2022, 5, 11)
     for game in games:
         base.create_game(game.black.name, game.white.name, game.result, (game.game_date - start_date).days)
-    base.iterate(1)
+    base.iterate(100)
+    print(base.get_ordered_ratings())
     for player in players:
-        player.elo = base.ratings_for_player(player.name)[-1][-1]
+        player.elo = base.ratings_for_player(player.name)[-1][1]
         player.save()
 
     return HttpResponseRedirect(reverse('elo:index'))
