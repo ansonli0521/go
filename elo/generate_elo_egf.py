@@ -60,7 +60,41 @@ def calculate(
 
     se = win_prob(r1_adj, r2_adj)
 
-    return r1 + con(r1) * (sa - se) + bonus(r1)
+    # return r1 + con(r1) * (sa - se) + bonus(r1)
+    return r1 + con(r1) * (sa - se)
+
+def first_five_calculate(
+    r1: float,
+    r2: float,
+    sa: float,
+    color: str = "white",
+    handicap: int = 0,
+) -> Decimal:
+    """Calculate new rating of the player
+    :param r1: EGD rating of the player
+    :param r2: EGD rating of the opponent
+    :param sa: actual game result, either 0, 0.5 or 1
+    :param color: either "white" or "black", has no effect without handicap
+    :param handicap: between 0 and 9
+    """
+    r1 = r1_adj = Decimal(r1)
+    r2_adj = Decimal(r2)
+    sa = Decimal(sa)
+    
+    assert sa in (0, 0.5, 1), "sa should be either 0, 0.5 or 1"
+    assert color in ("white", "black"), "color should be either 'white' or 'black'"
+    assert 0 <= handicap <= 9, "handicap should be between 0 and 9"
+
+    if handicap > 0:
+        if color == "white":
+            r2_adj += 50 + 100 * (handicap - 1)
+        else:
+            r1_adj += 50 + 100 * (handicap - 1)
+
+    se = win_prob(r1_adj, r2_adj)
+
+    # first five games double elo change
+    return r1 + 2 * (con(r1) * (sa - se))
 
 try:
     players = Player.objects.all()
@@ -70,9 +104,10 @@ try:
     history_sheet = book.create_sheet("History")
     history_sheet.cell(row=1, column=1).value = 'Date'
     history_sheet.cell(row=1, column=2).value = 'Player'
-    history_sheet.cell(row=1, column=3).value = 'Old Elo'
-    history_sheet.cell(row=1, column=4).value = 'New Elo'
-    history_sheet.cell(row=1, column=5).value = 'Elo Change'
+    history_sheet.cell(row=1, column=3).value = 'Opponent'
+    history_sheet.cell(row=1, column=4).value = 'Old Elo'
+    history_sheet.cell(row=1, column=5).value = 'New Elo'
+    history_sheet.cell(row=1, column=6).value = 'Elo Change'
     c=2
     for game in games:
         black_player = game.black
@@ -80,26 +115,50 @@ try:
         black_old_elo = black_player.elo
         white_old_elo = white_player.elo
         if game.result == 'B':
-            black_player.elo = calculate(black_old_elo, white_old_elo, 1, 'black')
-            white_player.elo = calculate(white_old_elo, black_old_elo, 0, 'white')
+            if black_player.total_games < 5:
+                black_player.elo = first_five_calculate(black_old_elo, white_old_elo, 1, 'black', game.handicap)
+            else:
+                black_player.elo = calculate(black_old_elo, white_old_elo, 1, 'black', game.handicap)
+            # if white_player.total_games < 5:
+            #     white_player.elo = first_five_calculate(white_old_elo, black_old_elo, 0, 'white', game.handicap)
+            # else:
+            #     white_player.elo = calculate(white_old_elo, black_old_elo, 0, 'white', game.handicap)
+            white_player.elo = calculate(white_old_elo, black_old_elo, 0, 'white', game.handicap)
         elif game.result == 'W':
-            black_player.elo = calculate(black_old_elo, white_old_elo, 0, 'black')
-            white_player.elo = calculate(white_old_elo, black_old_elo, 1, 'white')
+            # if black_player.total_games < 5:
+            #     black_player.elo = first_five_calculate(black_old_elo, white_old_elo, 0, 'black', game.handicap)
+            # else:
+            #     black_player.elo = calculate(black_old_elo, white_old_elo, 0, 'black', game.handicap)
+            black_player.elo = calculate(black_old_elo, white_old_elo, 0, 'black', game.handicap)
+            if white_player.total_games < 5:
+                white_player.elo = first_five_calculate(white_old_elo, black_old_elo, 1, 'white', game.handicap)
+            else:
+                white_player.elo = calculate(white_old_elo, black_old_elo, 1, 'white', game.handicap)        
         elif game.result == 'D':
-            black_player.elo = calculate(black_old_elo, white_old_elo, 0.5, 'black')
-            white_player.elo = calculate(white_old_elo, black_old_elo, 0.5, 'white')
+            if black_player.total_games < 5:
+                black_player.elo = first_five_calculate(black_old_elo, white_old_elo, 0.5, 'black', game.handicap)
+            else:
+                black_player.elo = calculate(black_old_elo, white_old_elo, 0.5, 'black', game.handicap)
+            if white_player.total_games < 5:
+                white_player.elo = first_five_calculate(white_old_elo, black_old_elo, 0.5, 'white', game.handicap)
+            else:
+                white_player.elo = calculate(white_old_elo, black_old_elo, 0.5, 'white', game.handicap)
+        black_player.total_games += 1
+        white_player.total_games += 1
         black_player.save()
         white_player.save()
         history_sheet.cell(row=c, column=1).value = game.game_date
         history_sheet.cell(row=c, column=2).value = black_player.name
-        history_sheet.cell(row=c, column=3).value = black_old_elo
-        history_sheet.cell(row=c, column=4).value = black_player.elo
-        history_sheet.cell(row=c, column=5).value = black_player.elo - Decimal(black_old_elo)
+        history_sheet.cell(row=c, column=3).value = white_player.name
+        history_sheet.cell(row=c, column=4).value = black_old_elo
+        history_sheet.cell(row=c, column=5).value = black_player.elo
+        history_sheet.cell(row=c, column=6).value = black_player.elo - Decimal(black_old_elo)
         history_sheet.cell(row=c+1, column=1).value = game.game_date
         history_sheet.cell(row=c+1, column=2).value = white_player.name
-        history_sheet.cell(row=c+1, column=3).value = white_old_elo
-        history_sheet.cell(row=c+1, column=4).value = white_player.elo
-        history_sheet.cell(row=c+1, column=5).value = white_player.elo - Decimal(white_old_elo)
+        history_sheet.cell(row=c+1, column=3).value = black_player.name
+        history_sheet.cell(row=c+1, column=4).value = white_old_elo
+        history_sheet.cell(row=c+1, column=5).value = white_player.elo
+        history_sheet.cell(row=c+1, column=6).value = white_player.elo - Decimal(white_old_elo)
         c+=2
 
     elo_sheet = book.create_sheet('Elo')

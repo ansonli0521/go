@@ -3,9 +3,9 @@ from elo.models import Player, Game
 import traceback
 
 rank_elo_map = {
-    '15k': 600,
-    '10k': 1100,
-    '5k': 1600,
+    '12k': 900,
+    '8k': 1300,
+    '4k': 1700,
     '1d': 2100,
     '3d': 2300,
     '5d': 2500
@@ -29,22 +29,20 @@ try:
     game_sheet = book.get_sheet_by_name('Record')
     c = 2
     black = game_sheet.cell(row=c, column=3).value
-    white = game_sheet.cell(row=c, column=4).value
-    result = game_sheet.cell(row=c, column=7).value
+    white = game_sheet.cell(row=c, column=5).value
+    handicap = game_sheet.cell(row=c, column=8).value
+    result = game_sheet.cell(row=c, column=10).value
     game_date = game_sheet.cell(row=c, column=2).value
     while black is not None and white is not None and result is not None and game_date is not None:
         black_player = Player.objects.get(name=black)
         white_player = Player.objects.get(name=white)
-        new_game = Game(black=black_player, white=white_player, result=result, game_date=game_date)
+        new_game = Game(black=black_player, white=white_player, handicap=handicap, result=result, game_date=game_date)
         new_game.save()
-        black_player.total_games += 1
-        black_player.save()
-        white_player.total_games += 1
-        white_player.save()
         c += 1
         black = game_sheet.cell(row=c, column=3).value
-        white = game_sheet.cell(row=c, column=4).value
-        result = game_sheet.cell(row=c, column=7).value
+        white = game_sheet.cell(row=c, column=5).value
+        handicap = game_sheet.cell(row=c, column=8).value
+        result = game_sheet.cell(row=c, column=10).value
         game_date = game_sheet.cell(row=c, column=2).value
     print('game data input finished')
     book.close()

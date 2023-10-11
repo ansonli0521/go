@@ -3,9 +3,9 @@ from elo.models import Player
 import traceback
 
 rank_elo_map = {
-    '15k': 600,
-    '10k': 1100,
-    '5k': 1600,
+    '12k': 900,
+    '8k': 1300,
+    '4k': 1700,
     '1d': 2100,
     '3d': 2300,
     '5d': 2500
@@ -21,6 +21,7 @@ try:
         ini_elo = rank_elo_map[ini_rank]
         player = Player.objects.get(name=player_name)
         player.elo = ini_elo
+        player.total_games = 0
         player.save()
         c += 1
         player_name = player_sheet.cell(row=c, column=1).value

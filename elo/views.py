@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views import generic
 from django.contrib import messages
+from django.db.models import Q
 from .models import Player, Game
 from datetime import date
 import whr
@@ -16,10 +17,11 @@ class IndexView(generic.ListView):
         return Player.objects.order_by('-elo')
 
 
-class ProfileView(generic.DetailView):
-    model = Player
-    template_name = 'elo/profile.html'
-
+def profile(request, player_id):
+    player = Player.objects.get(pk=player_id)
+    games = Game.objects.filter(Q(black=player) | Q(white=player)).order_by('-game_date')
+    
+    return render(request, 'elo/profile.html', {'player': player, 'games': games})
 
 class ResultInputView(generic.ListView):
     template_name = 'elo/result_input.html'
@@ -61,15 +63,14 @@ def elo_calculate(request):
     )
     new_game.save()
 
-    base = whr.Base(config={'w2': 300})
+    base = whr.Base(config={'w2': 30})
     games = Game.objects.order_by('game_date')
-    start_date = date(2022, 5, 11)
+    start_date = date(2023, 1, 1)
     for game in games:
         base.create_game(game.black.name, game.white.name, game.result, (game.game_date - start_date).days)
-    base.iterate(100)
-    print(base.get_ordered_ratings())
+    base.iterate(1)
     for player in players:
-        player.elo = base.ratings_for_player(player.name)[-1][1]
+        player.elo = base.ratings_for_player(player.name)[-1][-1]
         player.save()
 
     return HttpResponseRedirect(reverse('elo:index'))

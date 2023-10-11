@@ -9,5 +9,10 @@ class Player(models.Model):
 class Game(models.Model):
     black = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="black")
     white = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="white")
+    handicap = models.IntegerField(default=0)
     result = models.CharField(max_length=1)
     game_date = models.DateField()
+    black_old_elo = models.FloatField(default=0)
+    black_new_elo = models.FloatField(default=0)
+    white_old_elo = models.FloatField(default=0)
+    white_new_elo = models.FloatField(default=0)
