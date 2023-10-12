@@ -1,6 +1,7 @@
 import openpyxl
 from elo.models import Player, Game
 from datetime import date, timedelta
+from django.db.models import Q
 import traceback
 from decimal import Decimal
 
@@ -61,7 +62,7 @@ def calculate(
     se = win_prob(r1_adj, r2_adj)
 
     # return r1 + con(r1) * (sa - se) + bonus(r1)
-    return r1 + con(r1) * (sa - se)
+    return r1 + Decimal(1.5) * (con(r1) * (sa - se))
 
 def first_five_calculate(
     r1: float,
@@ -94,7 +95,7 @@ def first_five_calculate(
     se = win_prob(r1_adj, r2_adj)
 
     # first five games double elo change
-    return r1 + 2 * (con(r1) * (sa - se))
+    return r1 + 3 * (con(r1) * (sa - se))
 
 try:
     players = Player.objects.all()
@@ -170,12 +171,23 @@ try:
     elo_sheet.cell(row=1, column=1).value = 'Player'
     elo_sheet.cell(row=1, column=2).value = 'Elo'
     elo_sheet.cell(row=1, column=3).value = 'Total Games'
+    elo_sheet.cell(row=1, column=4).value = 'Status'
     c=2
     players = Player.objects.order_by('-elo')
     for player in players:
+        latest_game = Game.objects.filter(Q(black=player) | Q(white=player)).order_by('-game_date').first()
+        if latest_game.game_date + timedelta(days=180) < date.today():
+            player.status = 'inactive'
+        elif player.total_games <= 5:
+            player.status = 'new'
+        else:
+            player.status = 'normal'
+        player.save()
+
         elo_sheet.cell(row=c, column=1).value = player.name
         elo_sheet.cell(row=c, column=2).value = player.elo
         elo_sheet.cell(row=c, column=3).value = player.total_games
+        elo_sheet.cell(row=c, column=4).value = player.status
         c+=1
 
     book.save('LIHKG-Record-with-Elo.xlsx')
