@@ -147,6 +147,11 @@ try:
         white_player.total_games += 1
         black_player.save()
         white_player.save()
+        game.black_old_elo = black_old_elo
+        game.white_old_elo = white_old_elo
+        game.black_new_elo = black_player.elo
+        game.white_new_elo = white_player.elo
+        game.save()
         history_sheet.cell(row=c, column=1).value = game.game_date
         history_sheet.cell(row=c, column=2).value = black_player.name
         history_sheet.cell(row=c, column=3).value = white_player.name
