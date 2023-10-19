@@ -1,9 +1,17 @@
+{% load elo_extras %}
 <table>
     <tr>
         <th>Black Player</th>
         <th>White Player</th>
+        <th>Handicap</th>
         <th>Result</th>
         <th>Game Date</th>
+        <th>Black Old Elo</th>
+        <th>Black New Elo</th>
+        <th>Black Elo Change</th>
+        <th>White Old Elo</th>
+        <th>White New Elo</th>
+        <th>White Elo Change</th>
     </tr>
     {% for game in games %}
         <tr>
@@ -14,10 +22,31 @@
                 <a href="{% url 'elo:profile' game.white.id %}">{{ game.white.name }}</a>
             </td>
             <td>
+                {{ game.handicap }}
+            </td>
+            <td>
                 {{ game.result }}
             </td>
             <td>
                 {{ game.game_date }}
+            </td>
+            <td>
+                {{ game.black_old_elo }}
+            </td>
+            <td>
+                {{ game.black_new_elo }}
+            </td>
+            <td>
+                {{ game.black_new_elo|subtract:game.black_old_elo }}
+            </td>
+            <td>
+                {{ game.white_old_elo }}
+            </td>
+            <td>
+                {{ game.white_new_elo }}
+            </td>
+            <td>
+                {{ game.white_new_elo|subtract:game.white_old_elo }}
             </td>
         </tr>
     {% endfor %}

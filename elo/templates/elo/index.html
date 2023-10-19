@@ -1,8 +1,13 @@
+<a href="{% url 'elo:elo_calculation' %}">Elo Calculation</a>
+<br/>
+<a href="{% url 'elo:game_history' %}">Game History</a>
+<br/><br/>
 <table>
     <tr>
         <th align="center">Player</th>
         <th align="center">Elo</th>
         <th align="center">Total Games</th>
+        <th align="center">Status</th>
     </tr>
     {% for player in players %}
         <tr>
@@ -14,6 +19,9 @@
             </td>
             <td align="center">
                 {{ player.total_games }}
+            </td>
+            <td align="center">
+                {{ player.status }}
             </td>
         </tr>
     {% endfor %}

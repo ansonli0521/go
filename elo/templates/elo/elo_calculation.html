@@ -1,0 +1,23 @@
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+<h1>Elo Calculation</h1>
+<form action="{% url 'elo:elo_calculate' %}" method="post">
+{% csrf_token %}
+    <fieldset>
+        <label for="method">Rating System:</label>
+        <select name="method" id="method">
+            <option value="elo">traditional ELO</option>
+            <option value="egf">EGF</option>
+        </select><br><br>
+        <label for="k">K (con factor for EGF):</label>
+        <input type="number" id="k" name="k"><br><br>
+        <label for="f">First Five Factor:</label>
+        <input type="number" id="f" name="f"><br><br>
+    </fieldset>
+<input type="submit" value="Submit">
+</form>
