@@ -4,6 +4,7 @@ from datetime import date, timedelta
 from django.db.models import Q
 import traceback
 import math
+from elo.constants import source, out_source
 
 # Function to calculate the Probability
 def probability(rating1, rating2):
@@ -90,7 +91,7 @@ def calculate(k,f):
         players = Player.objects.all()
         games = Game.objects.order_by('game_date')
         start_date = date(2022, 5, 11)
-        book = openpyxl.load_workbook('/Users/ansonli/go/elo/LIHKG-Record.xlsx')
+        book = openpyxl.load_workbook(source)
         history_sheet = book.create_sheet("History")
         history_sheet.cell(row=1, column=1).value = 'Date'
         history_sheet.cell(row=1, column=2).value = 'Player'
@@ -158,7 +159,7 @@ def calculate(k,f):
             elo_sheet.cell(row=c, column=4).value = player.status
             c+=1
 
-        book.save('/Users/ansonli/go/elo/LIHKG-Record-with-Elo.xlsx')
+        book.save(out_source)
         book.close()
     except:
         book.close()

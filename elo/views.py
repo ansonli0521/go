@@ -9,8 +9,8 @@ from datetime import date
 from elo.generate_elo import calculate
 from elo.generate_elo_egf import egf_calculate
 from elo.elo_reset import reset
+from elo.game_input import delete_all_games, game_input
 from decimal import Decimal
-import whr
 
 
 class IndexView(generic.ListView):
@@ -48,4 +48,9 @@ def elo_calculate(request):
         calculate(float(request.POST['k']), float(request.POST['f']))
     else:
         egf_calculate(Decimal(request.POST['k']), Decimal(request.POST['f']))
+    return HttpResponseRedirect(reverse('elo:index'))
+
+def reset_games(request):
+    delete_all_games()
+    game_input()
     return HttpResponseRedirect(reverse('elo:index'))

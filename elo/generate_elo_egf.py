@@ -4,6 +4,7 @@ from datetime import date, timedelta
 from django.db.models import Q
 import traceback
 from decimal import Decimal
+from elo.constants import source, out_source
 
 """
 EGF Official Rating System (since 2021)
@@ -105,7 +106,7 @@ def egf_calculate(k,f):
         players = Player.objects.all()
         games = Game.objects.order_by('game_date')
         start_date = date(2022, 5, 11)
-        book = openpyxl.load_workbook('/Users/ansonli/go/elo/LIHKG-Record.xlsx')
+        book = openpyxl.load_workbook(source)
         history_sheet = book.create_sheet("History")
         history_sheet.cell(row=1, column=1).value = 'Date'
         history_sheet.cell(row=1, column=2).value = 'Player'
@@ -194,7 +195,7 @@ def egf_calculate(k,f):
             elo_sheet.cell(row=c, column=4).value = player.status
             c+=1
 
-        book.save('/Users/ansonli/go/elo/LIHKG-Record-with-Elo.xlsx')
+        book.save(out_source)
         book.close()
     except:
         book.close()
