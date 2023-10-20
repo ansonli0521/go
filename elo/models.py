@@ -5,6 +5,9 @@ class Player(models.Model):
     name = models.CharField(max_length=200)
     elo = models.FloatField()
     total_games = models.IntegerField(default=0)
+    win = models.IntegerField(default=0)
+    lost = models.IntegerField(default=0)
+    winrate = models.CharField(max_length=200, default='0%')
     status = models.CharField(max_length=200, default='new')
 
 class Game(models.Model):

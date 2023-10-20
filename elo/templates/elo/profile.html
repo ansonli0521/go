@@ -1,10 +1,13 @@
 {% load elo_extras %}
 <h1>{{ player.name }}</h1>
 <p>Elo: {{ player.elo }}</p>
+<p>Total Games: {{ player.total_games }}</p>
+<p>Winrate: {{ player.winrate }}</p>
 <table>
     <tr>
         <th>Black Player</th>
         <th>White Player</th>
+        <th>Handicap</th>
         <th>Result</th>
         <th>Game Date</th>
         <th>Elo after Game</th>
@@ -18,6 +21,9 @@
                 </td>
                 <td>
                     <a href="{% url 'elo:profile' game.white.id %}">{{ game.white.name }}</a>
+                </td>
+                <td>
+                    {{ game.handicap }}
                 </td>
                 <td>
                     {{ game.result }}
@@ -37,6 +43,9 @@
                 </td>
                 <td>
                     <a>{{ game.white.name }}</a>
+                </td>
+                <td>
+                    {{ game.handicap }}
                 </td>
                 <td>
                     {{ game.result }}

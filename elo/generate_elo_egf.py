@@ -130,6 +130,8 @@ def egf_calculate(k,f):
                 # else:
                 #     white_player.elo = calculate(white_old_elo, black_old_elo, 0, 'white', game.handicap)
                 white_player.elo = calculate(white_old_elo, black_old_elo, 0, 'white', game.handicap, k)
+                black_player.win += 1
+                white_player.lost += 1
             elif game.result == 'W':
                 # if black_player.total_games < 5:
                 #     black_player.elo = first_five_calculate(black_old_elo, white_old_elo, 0, 'black', game.handicap)
@@ -139,7 +141,9 @@ def egf_calculate(k,f):
                 if white_player.total_games < 5:
                     white_player.elo = first_five_calculate(white_old_elo, black_old_elo, 1, 'white', game.handicap, k, f)
                 else:
-                    white_player.elo = calculate(white_old_elo, black_old_elo, 1, 'white', game.handicap, k)        
+                    white_player.elo = calculate(white_old_elo, black_old_elo, 1, 'white', game.handicap, k)
+                black_player.lost += 1
+                white_player.win += 1
             elif game.result == 'D':
                 if black_player.total_games < 5:
                     black_player.elo = first_five_calculate(black_old_elo, white_old_elo, 0.5, 'black', game.handicap, k, f)
@@ -176,7 +180,10 @@ def egf_calculate(k,f):
         elo_sheet.cell(row=1, column=1).value = 'Player'
         elo_sheet.cell(row=1, column=2).value = 'Elo'
         elo_sheet.cell(row=1, column=3).value = 'Total Games'
-        elo_sheet.cell(row=1, column=4).value = 'Status'
+        elo_sheet.cell(row=1, column=4).value = 'Win'
+        elo_sheet.cell(row=1, column=5).value = 'Lost'
+        elo_sheet.cell(row=1, column=6).value = 'Win Rate'
+        elo_sheet.cell(row=1, column=7).value = 'Status'
         c=2
         players = Player.objects.order_by('-elo')
         for player in players:
@@ -187,12 +194,16 @@ def egf_calculate(k,f):
                 player.status = 'new'
             else:
                 player.status = 'normal'
+            player.winrate = str(round((player.win / player.total_games) * 10000) / 100) + '%'
             player.save()
 
             elo_sheet.cell(row=c, column=1).value = player.name
             elo_sheet.cell(row=c, column=2).value = player.elo
             elo_sheet.cell(row=c, column=3).value = player.total_games
-            elo_sheet.cell(row=c, column=4).value = player.status
+            elo_sheet.cell(row=c, column=4).value = player.win
+            elo_sheet.cell(row=c, column=5).value = player.lost
+            elo_sheet.cell(row=c, column=6).value = player.winrate
+            elo_sheet.cell(row=c, column=7).value = player.status
             c+=1
 
         book.save(out_source)

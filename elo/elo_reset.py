@@ -16,6 +16,9 @@ def reset():
             player = Player.objects.get(name=player_name)
             player.elo = ini_elo
             player.total_games = 0
+            player.win = 0
+            player.lost = 0
+            player.status = 'new'
             player.save()
             c += 1
             player_name = player_sheet.cell(row=c, column=1).value

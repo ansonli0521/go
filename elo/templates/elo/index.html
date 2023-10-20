@@ -9,6 +9,9 @@
         <th align="center">Player</th>
         <th align="center">Elo</th>
         <th align="center">Total Games</th>
+        <th align="center">Win</th>
+        <th align="center">Lost</th>
+        <th align="center">Win Rate</th>
         <th align="center">Status</th>
     </tr>
     {% for player in players %}
@@ -21,6 +24,15 @@
             </td>
             <td align="center">
                 {{ player.total_games }}
+            </td>
+            <td align="center">
+                {{ player.win }}
+            </td>
+            <td align="center">
+                {{ player.lost }}
+            </td>
+            <td align="center">
+                {{ player.winrate }}
             </td>
             <td align="center">
                 {{ player.status }}
