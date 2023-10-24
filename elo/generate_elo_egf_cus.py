@@ -237,10 +237,11 @@ def egf_calculate(k,f):
         df1 = pd.DataFrame(hist)
         df1.to_csv(csv_out_path + 'history.csv', index=False)
         gme = {
+            "Date": gdat,
             "Black": blk,
             "White": wht,
-            "Handicap": hdcp,
             "Result": rst,
+            "Handicap": hdcp,
             "Black Old Elo": b_o_elo,
             "Black New Elo": b_n_elo,
             "Black Elo Change": b_elo_chg,
