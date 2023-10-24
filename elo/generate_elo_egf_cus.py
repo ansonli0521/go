@@ -131,6 +131,17 @@ def egf_calculate(k,f):
         o_elo = []
         n_elo = []
         elo_chg = []
+        blk = []
+        wht = []
+        hdcp = []
+        rst = []
+        gdat = []
+        b_o_elo = []
+        b_n_elo = []
+        w_o_elo = []
+        w_n_elo = []
+        b_elo_chg = []
+        w_elo_chg = []
         c=2
         for game in games:
             black_player = game.black
@@ -203,6 +214,17 @@ def egf_calculate(k,f):
             o_elo.append(white_old_elo)
             n_elo.append(white_player.elo)
             elo_chg.append(white_player.elo - Decimal(white_old_elo))
+            blk.append(black_player.name)
+            wht.append(white_player.name)
+            hdcp.append(game.handicap)
+            gdat.append(game.game_date)
+            rst.append(game.result)
+            b_o_elo.append(black_old_elo)
+            b_n_elo.append(black_player.elo)
+            b_elo_chg.append(black_player.elo - Decimal(black_old_elo))
+            w_o_elo.append(white_old_elo)
+            w_n_elo.append(white_player.elo)
+            w_elo_chg.append(white_player.elo - Decimal(white_old_elo))
             c+=2
         hist = {
             "Date": dat,
@@ -214,6 +236,20 @@ def egf_calculate(k,f):
         }
         df1 = pd.DataFrame(hist)
         df1.to_csv(csv_out_path + 'history.csv', index=False)
+        gme = {
+            "Black": blk,
+            "White": wht,
+            "Handicap": hdcp,
+            "Result": rst,
+            "Black Old Elo": b_o_elo,
+            "Black New Elo": b_n_elo,
+            "Black Elo Change": b_elo_chg,
+            "White Old Elo": w_o_elo,
+            "White New Elo": w_n_elo,
+            "White Elo Change": w_elo_chg
+        }
+        df3 = pd.DataFrame(gme)
+        df3.to_csv(csv_out_path + 'game.csv', index=False)
 
         elo_sheet = book.create_sheet('Elo')
         elo_sheet.cell(row=1, column=1).value = 'Player'
