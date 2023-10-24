@@ -223,6 +223,7 @@ def egf_calculate(k,f):
         elo_sheet.cell(row=1, column=5).value = 'Lost'
         elo_sheet.cell(row=1, column=6).value = 'Win Rate'
         elo_sheet.cell(row=1, column=7).value = 'Status'
+        rk = []
         play = []
         el = []
         ttl = []
@@ -257,9 +258,11 @@ def egf_calculate(k,f):
             l.append(player.lost)
             wr.append(player.winrate)
             st.append(player.status)
+            rk.append(c-1)
             c+=1
         
         elo = {
+            "Rank": rk,
             "Player": play,
             "Elo": el,
             "Total Games": ttl,
