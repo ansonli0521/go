@@ -231,7 +231,7 @@ def egf_calculate(k,f):
             "Player": ply,
             "Oppoent": opp,
             "Old Elo": o_elo,
-            "New Elo": n_elo,
+            "Elo": n_elo,
             "Elo Change": elo_chg
         }
         df1 = pd.DataFrame(hist)
