@@ -15,15 +15,15 @@ def game_input():
         book = openpyxl.load_workbook(source)
         player_sheet = book.get_sheet_by_name('Player')
         c = 2
-        player_name = player_sheet.cell(row=c, column=1).value
-        ini_rank = player_sheet.cell(row=c, column=2).value
+        player_name = player_sheet.cell(row=c, column=2).value
+        ini_rank = player_sheet.cell(row=c, column=3).value
         while player_name and ini_rank is not None:
             ini_elo = rank_elo_map[ini_rank]
             new_player = Player(name=player_name, elo=ini_elo, total_games=0)
             new_player.save()
             c += 1
-            player_name = player_sheet.cell(row=c, column=1).value
-            ini_rank = player_sheet.cell(row=c, column=2).value
+            player_name = player_sheet.cell(row=c, column=2).value
+            ini_rank = player_sheet.cell(row=c, column=3).value
         print('player data input finished')
 
         game_sheet = book.get_sheet_by_name('Record')
