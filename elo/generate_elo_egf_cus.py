@@ -202,18 +202,31 @@ def egf_calculate(k,f):
             history_sheet.cell(row=c+1, column=4).value = white_old_elo
             history_sheet.cell(row=c+1, column=5).value = white_player.elo
             history_sheet.cell(row=c+1, column=6).value = white_player.elo - Decimal(white_old_elo)
-            dat.append(game.game_date)
-            ply.append(black_player.name)
-            opp.append(white_player.name)
-            o_elo.append(black_old_elo)
-            n_elo.append(black_player.elo)
-            elo_chg.append(black_player.elo - Decimal(black_old_elo))
-            dat.append(game.game_date)
-            ply.append(white_player.name)
-            opp.append(black_player.name)
-            o_elo.append(white_old_elo)
-            n_elo.append(white_player.elo)
-            elo_chg.append(white_player.elo - Decimal(white_old_elo))
+            if len(dat) == 0:
+                dat.append(game.game_date)
+                ply.append(black_player.name)
+                n_elo.append(black_player.elo)
+                dat.append(game.game_date)
+                ply.append(white_player.name)
+                n_elo.append(white_player.elo)
+            else:
+                black_new = True
+                white_new = True
+                for i in range(len(dat)):
+                    if dat[i] == game.game_date and ply[i] == black_player.name:
+                        n_elo[i] = black_player.elo
+                        black_new = False
+                    if dat[i] == game.game_date and ply[i] == white_player.name:
+                        n_elo[i] = white_player.elo
+                        white_new = False              
+                if black_new:
+                    dat.append(game.game_date)
+                    ply.append(black_player.name)
+                    n_elo.append(black_player.elo)
+                if white_new:
+                    dat.append(game.game_date)
+                    ply.append(white_player.name)
+                    n_elo.append(white_player.elo)
             blk.append(black_player.name)
             wht.append(white_player.name)
             hdcp.append(game.handicap)
@@ -229,10 +242,7 @@ def egf_calculate(k,f):
         hist = {
             "Date": dat,
             "Player": ply,
-            "Oppoent": opp,
-            "Old Elo": o_elo,
             "Elo": n_elo,
-            "Elo Change": elo_chg
         }
         df1 = pd.DataFrame(hist)
         df1.to_csv(csv_out_path + 'history.csv', index=False)
